@@ -3,28 +3,61 @@
   <head>
     <meta charset="UTF-8" />
     <title>Shopping List App</title>
-    <link rel="stylesheet" />
+    <link rel="stylesheet" href="main.css" />
   </head>
   <body>
     <div id="shopping-list">
+<div class="header">
       <h1>{{ header.toLocaleUpperCase() }}</h1>
-      <input v-model="newItem" type="text" placeholder="Add a new item"></input>
-      <button class="btn btn-primary" v-on:click="items.push(newItem)">Save item</button>
-      <ul>
-        <li v-for="item in items">{{ item }}</li>
-      </ul>
+      <button v-if="state === 'default'" class="btn btn-primary" @click="changeState('edit')">Add Item</button>
+      <button v-else class="btn btn-primary" @click="changeState('default')">Cancel</button>
     </div>
-
+      <div v-if="state === 'edit'" class="add-item-form">
+      <input v-model="newItem" type="text" placeholder="Add a new item" @keyup.enter="saveItem"></input>
+      <button class="btn btn-primary" v-bind:disabled="newItem.length === 0" @click="saveItem">Save item</button>
+      </div>
+      <ul>
+        <li v-for="item in items" :class="[item.purchased ? 'strikeout' : '', item.highPriority ? 'priority' : '']">{{ item.label }}</li>
+      </ul>
+            <p v-if="items.length === 0">Nice job! You've bought all your items.</p>
+    </div>
     <script src="https://unpkg.com/vue@2"></script>
     <script>
       var shoppingList = new Vue({
         el: '#shopping-list',
         data: {
-          header: 'Shopping list: Party',
+          state: 'default',
+          header: 'Shopping list App',
           newItem: '',
-          items: ['item 1', 'item 2', 'item 3', 'item 4']
+          items: [
+                        {
+                            label: '10 party hats',
+                            purchased: false,
+                            highPriority: false,
+                        },
+                        {
+                            label: '2 board games',
+                            purchased: true,
+                            highPriority: false,
+                        },
+                        {
+                            label: '20 cups',
+                            purchased: false,
+                            highPriority: false,
+                        },
+                    ]
+        },
+        methods: {
+          saveItem: function() {
+          this.items.push(this.newItem);
+          this.newItem='';
+        },
+        changeState: function(newState) {
+          this.state = newState;
+          this.newItem ='';
         }
-      })
+      }
+      });
     </script>
   </body>
 </html>
